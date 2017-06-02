@@ -5,12 +5,14 @@
 # enough files in that folder to then be within the threshold. It stops once the threshold is
 # satisfied and then runs your backup (if you enter the commands where specified).
 
+# It goes without saying, if misconfigured, this script can be highly dangerous
+# Set testmode to 0 only when you are 100% confident your config is working correctly
+# It should show you the folder it will remove, and that should be the oldest folder
+
 # User Settings
 threshold=90 # How much disk usage % before cleanup
 folder='/home/robbie/backup' # The folder which contains the subfolders
 device='/dev/sda1' # The device on which the folder resides
-# Set testmode to 0 when you are 100% confident your config is working correctly
-# It should show you the folder it will remove, and that should be the oldest folder
 testmode=1 # 0=destroy! 1=test only, do not remove anything
 
 echo "Cleanup v1.0"
@@ -24,7 +26,6 @@ else
 
 echo Folder: $folder
 
-#device=`findmnt -n -o SOURCE --target $folder`
 deviceesc=$(echo $device | sed 's/\//\\\//g')
 
 echo Device: $device
