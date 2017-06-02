@@ -11,8 +11,9 @@
 
 # User Settings
 threshold=90 # How much disk usage % before cleanup
-folder='/home/robbie/backup' # The folder which contains the subfolders
-device='/dev/sda1' # The device on which the folder resides
+folder='/home/cat5tv_main/backup/daily' # The folder which contains the subfolders
+device='/dev/mapper/backup' # The device on which the folder resides
+mode='file' # file | subfolder - which do you want to remove?
 testmode=1 # 0=destroy! 1=test only, do not remove anything
 
 echo "Cleanup v1.0"
@@ -37,14 +38,34 @@ echo Usage:  $diskusage%
 if [ "$diskusage" -lt "$threshold" ]; then echo Less than $threshold% usage. No cleanup needed.; exit; fi;
 
 while [ "$diskusage" -ge "$threshold" ]; do
+
   if [ "$testmode" -eq "1" ]; then
-    echo Test mode. Would remove: $(ls -dA1t $folder/*/ | tail -n 1)
+
+    if [ "$mode" = "file" ]; then
+      echo Test mode. Would remove: $(ls -A1t $folder/* | tail -n 1)
+    elif [ "$mode" = "subfolder" ]; then
+      echo Test mode. Would remove: $(ls -dA1t $folder/*/ | tail -n 1)
+    else
+      echo Invalid mode specified in config.
+    fi
+
     break
-  else
-    /bin/ls -dA1t $folder/*/ | /usr/bin/tail -n 1 | /usr/bin/xargs --verbose -d '\n' /bin/rm -rf
+
+  elif [ "$testmode" -eq "0" ]; then
+
+    if [ "$mode" = "file" ]; then
+      /bin/ls -A1t $folder/* | /usr/bin/tail -n 1 | /usr/bin/xargs --verbose -d '\n' /bin/rm -f
+    elif [ "$mode" = "subfolder" ]; then
+      /bin/ls -dA1t $folder/*/ | /usr/bin/tail -n 1 | /usr/bin/xargs --verbose -d '\n' /bin/rm -rf
+    else
+      echo Invalid mode specified in config.
+    fi
+
     /bin/sync
     diskusage=$(/bin/df -hl | /usr/bin/awk '/^'"$deviceesc"'/ { sum+=$5 } END { print sum }')
+
   fi
+
 done
 
 echo Done. Disk usage is now at $diskusage%.
