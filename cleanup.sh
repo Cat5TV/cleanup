@@ -10,13 +10,13 @@
 # It should show you the folder it will remove, and that should be the oldest folder
 
 # User Settings
-threshold=90 # How much disk usage % before cleanup
+threshold=95 # How much disk usage % before cleanup
 folder='/home/cat5tv_main/backup/daily' # The folder which contains the subfolders
 device='/dev/mapper/backup' # The device on which the folder resides
 mode='file' # file | subfolder - which do you want to remove?
-testmode=1 # 0=destroy! 1=test only, do not remove anything
+testmode=0 # 0=destroy! 1=test only, do not remove anything
 
-echo "Cleanup v1.0"
+echo "Cleanup v1.2"
 echo "By Robbie Ferguson"
 echo ""
 
@@ -27,11 +27,11 @@ else
 
 echo Folder: $folder
 
-deviceesc=$(echo $device | sed 's/\//\\\//g')
+# deviceesc=$(echo $device | sed 's/\//\\\//g')
 
 echo Device: $device
 
-diskusage=$(/bin/df -hl | /usr/bin/awk '/^'"$deviceesc"'/ { sum+=$5 } END { print sum }')
+diskusage=$(/bin/df -hl $device | /usr/bin/awk '/^\/dev\// { sum+=$5 } END { print sum }')
 
 echo Usage:  $diskusage%
 
@@ -62,7 +62,7 @@ while [ "$diskusage" -ge "$threshold" ]; do
     fi
 
     /bin/sync
-    diskusage=$(/bin/df -hl | /usr/bin/awk '/^'"$deviceesc"'/ { sum+=$5 } END { print sum }')
+    diskusage=$(/bin/df -hl $device | /usr/bin/awk '/^\/dev\// { sum+=$5 } END { print sum }')
 
   fi
 
