@@ -34,7 +34,7 @@ diskusage=$(/bin/df -hl | /usr/bin/awk '/^'"$deviceesc"'/ { sum+=$5 } END { prin
 
 echo Usage:  $diskusage%
 
-if [ "$diskusage" -lt "$threshold" ]; then echo Less than $threshold% usage. Nothing to do; exit; fi;
+if [ "$diskusage" -lt "$threshold" ]; then echo Less than $threshold% usage. No cleanup needed.; exit; fi;
 
 while [ "$diskusage" -ge "$threshold" ]; do
   if [ "$testmode" -eq "1" ]; then
